@@ -7,31 +7,26 @@ const refs = {
 };
 const { formEl, emailEl, textareaEl } = refs;
 const STORAGE_KEY = 'feedback-form-state';
-const formData = {};
+let formData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
-populateFormElements(STORAGE_KEY);
 formEl.addEventListener('submit', handleSubmit);
 formEl.addEventListener('input', throttle(onInputElements, 500));
+
+formData.email !== undefined ? (emailEl.value = formData.email) : '';
+formData.message !== undefined ? (textareaEl.value = formData.message) : '';
 
 function onInputElements(e) {
   formData[e.target.name] = e.target.value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
-function populateFormElements(key) {
-  const parsedData = JSON.parse(localStorage.getItem(key));
-  if (parsedData) {
-    parsedData.email ? (emailEl.value = parsedData.email) : '';
-    parsedData.message ? (textareaEl.value = parsedData.message) : '';
-  }
-}
-
 function handleSubmit(e) {
   e.preventDefault();
-  if (!emailEl.value || !textareaEl.value) {
+  if (!emailEl.value.trim() || !textareaEl.value.trim()) {
     return alert('Please fill in all the fields!');
   }
-  console.log({ email: emailEl.value, message: textareaEl.value });
+  console.log(formData);
   e.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
+  formData = {};
 }
